@@ -1,24 +1,26 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe } from "@nestjs/common";
-import { plainToClass } from "class-transformer";
-import { UserDto } from "./user.dto";
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Inject } from '@nestjs/common';
+import { LoggerService } from 'src/logger/logger.service';
+import { UserDto } from './user.dto';
+import { UserService } from './user.service';
 
-@Controller("user")
+@Controller('user')
 export class UserController {
-	@Post()
-	createUser(@Body() user: UserDto): UserDto {
-		user.id = 1;
-		user.createAt = new Date();
-		user.updatedAt = new Date();
-
-		return UserDto.plainToClass(user);
+	constructor(
+		private readonly userService: UserService,
+		private readonly loggerService: LoggerService,
+	) {
+		console.log(loggerService === userService.getLogger());
 	}
-	@Get(":id")
-	getUserById(@Param("id", ParseIntPipe) id: number): UserDto {
-		console.log(id);
-
-		return {
-			username: "admin",
-			password: "admin",
-		} as UserDto;
+	@Post()
+	createUser(@Body() user: UserDto) {
+		return this.loggerService.log();
+	}
+	@Get(':id')
+	getUserById(@Param('id', ParseIntPipe) id: number): UserDto {
+		return this.userService.getUserById(id);
+	}
+	@Get()
+	test1() {
+		return this.loggerService.log();
 	}
 }
